@@ -5,6 +5,7 @@ Keywords: php sample code, PHP Testaufgabe, php interview sample code.
 
 03:02am, 25th November - enough for now. Features:
 + Register, login, protected area access, logout, password reset functionality.
++ Obviously do not store passwords in plain text, use md5 hashing.
 + Maintain last login time for every user.
 + Password reset page sends you an e-mail with reset token, you can enter it manually or follow the link.
 + If the user logs in after the password reset e-mail has been sent, reset-token will be nullified because we know the user knows his password.
@@ -22,6 +23,10 @@ Keywords: php sample code, PHP Testaufgabe, php interview sample code.
 + Added PHPUnits for UserManager class. Run phpunit/run.sh, which will download 2.4mb phpunit and run the tests.
 09:44am, 25th November 2012 - enough for now.
 
+10:00am, 25th November 2012.
++ Write this README, add some comments to the code, rename couple of methods and add simplistic validation.
+11:20am, 25th November 2012.
+
 TODO: 
 * Add client-side validation, passwords should be non-empty and strong enough, also entered in two fields.
 * Add MySQL support, it should not be a big problem since I use PDO and SQL I used should be compatible with MySQL.
@@ -31,3 +36,4 @@ TODO:
 * Add a GD-based turing test to force a user to confirm he is a human, otherwise he can guess a password.
 * Extract all messages into separate messages file, using gettext for example.
 * One can even translate these messages into other languages and then show messages in user's favourite language.
+* Add activation e-mail, every john@doe can register and log in later. However the same is with my account on github, I didn't have to activate it.
