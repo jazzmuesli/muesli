@@ -1,5 +1,7 @@
 I started writing this small test project 'Muesli' in PHP at 22:40, 24th November 2012, after about 8 years of not writing in PHP for money.
 Why 'muesli'? I have a tradition to name home projects after the last disappeared piece of food.
+The purpose of this project is to imagine I want to add some sample code in PHP to my CV.
+Keywords: php sample code, PHP Testaufgabe, php interview sample code.
 
 03:02am, 25th November - enough for now. Features:
 + Register, login, protected area access, logout, password reset functionality.
