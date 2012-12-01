@@ -21,12 +21,12 @@ class MailLessUserManager extends UserManager {
 class UserManagerTest extends PHPUnit_Framework_TestCase
 {
 
-	protected $um;
+	protected $umanager;
 	/**
 	* prepare UserManager before every test.
 	*/
 	protected function setUp() {
-		$this->um = $this->prepareUM();
+		$this->umanager = $this->prepareUM();
 	}
 
 	/**
@@ -34,63 +34,63 @@ class UserManagerTest extends PHPUnit_Framework_TestCase
 	*/
 	private function prepareUM()  {
 		$dsn = 'sqlite::memory:';
-		$db = new PDO($dsn);
-		$um = new MailLessUserManager($db);
-		$um->recreateTables();
-		return $um;
+		$dbh = new PDO($dsn);
+		$umanager = new MailLessUserManager($dbh);
+		$umanager->recreateTables();
+		return $umanager;
 	}
 
 	public function testGoodRegister() {
-		$this->assertNotNull($this->um);
-		$this->assertEquals(0, count($this->um->emails));
-		$this->um->register(mt_rand(0,time()) . '@localhost', 'pwd-' . time());
-		$this->assertEquals(1, count($this->um->emails));
+		$this->assertNotNull($this->umanager);
+		$this->assertEquals(0, count($this->umanager->emails));
+		$this->umanager->register(mt_rand(0,time()) . '@localhost', 'pwd-' . time());
+		$this->assertEquals(1, count($this->umanager->emails));
  	}
 
 	public function testDuplicateRegister() {
-		$this->assertTrue($this->um->register('user@localhost', 'pwd'));
-		$this->assertFalse($this->um->register('user@localhost', 'doors'));
+		$this->assertTrue($this->umanager->register('user@localhost', 'pwd'));
+		$this->assertFalse($this->umanager->register('user@localhost', 'doors'));
 	}
 
 	/**
 	@expectedException InvalidEmailException
 	*/
 	public function testInvalidLogin() {
-		$this->um->register('invalid', 'invalid');
+		$this->umanager->register('invalid', 'invalid');
 	}
 
 	/**
 	@expectedException InvalidPasswordException
 	*/
 	public function testInvalidPassword() {
-		$this->um->login('normal@host', '');
+		$this->umanager->login('normal@host', '');
 	}
 
 	public function testGoodLogin() {
 		$email = 'test@localhost';
 		$pwd = 'password';
-		$this->assertTrue($this->um->register($email, $pwd));
-		$this->assertTrue($this->um->login($email, $pwd));
+		$this->assertTrue($this->umanager->register($email, $pwd));
+		$this->assertTrue($this->umanager->login($email, $pwd));
 	}
 
 	public function testWrongLogin() {
-		$this->assertFalse($this->um->login('user@localhost', 'beatles'));
+		$this->assertFalse($this->umanager->login('user@localhost', 'beatles'));
 	}
 
 	public function testPasswordReset() {
 		$this->passwordReset('user@localhost','first');
 	}
 	public function testPasswordResetUnknownEmail() {
-		$this->assertFalse($this->um->passwordReset('unknown@localhost'));
-		$this->assertEquals(0, count($this->um->emails));
+		$this->assertFalse($this->umanager->passwordReset('unknown@localhost'));
+		$this->assertEquals(0, count($this->umanager->emails));
 	}
 
 	public function passwordReset($email, $pwd) {
-		$this->assertTrue($this->um->register($email, $pwd));
-		$this->assertTrue($this->um->login($email, $pwd));
-		$this->assertTrue($this->um->passwordReset($email));
-		$this->assertEquals(2, count($this->um->emails));
-		$token = $this->um->emails[1]['token'];
+		$this->assertTrue($this->umanager->register($email, $pwd));
+		$this->assertTrue($this->umanager->login($email, $pwd));
+		$this->assertTrue($this->umanager->passwordReset($email));
+		$this->assertEquals(2, count($this->umanager->emails));
+		$token = $this->umanager->emails[1]['token'];
 		$this->assertNotEmpty($token);
 		return $token;
 	}
@@ -98,29 +98,29 @@ class UserManagerTest extends PHPUnit_Framework_TestCase
 	public function testPasswordChangeWrongToken() {
 		$email = 'user@localhost';
 		$pwd = 'first';
-		$token = $this->passwordReset($email,$pwd);
+		$this->passwordReset($email,$pwd);
 		$pwd = 'second';
-		$this->assertFalse($this->um->passwordChange($email, 'wrongToken', $pwd));
-		$this->assertFalse($this->um->login($email, $pwd));
+		$this->assertFalse($this->umanager->passwordChange($email, 'wrongToken', $pwd));
+		$this->assertFalse($this->umanager->login($email, $pwd));
 	}
 
 	public function testPasswordChangeGoodLoginInTheMiddle() {
 		$email = 'user@localhost';
 		$pwd = 'first';
 		$token = $this->passwordReset($email, $pwd);
-		$this->assertTrue($this->um->login($email, $pwd));
+		$this->assertTrue($this->umanager->login($email, $pwd));
 		$pwd = 'second';
-		$this->assertFalse($this->um->passwordChange($email, $token, $pwd));
+		$this->assertFalse($this->umanager->passwordChange($email, $token, $pwd));
 	}
 
 	public function testPasswordChangeOK() {
 		$email = 'user@localhost';
 		$pwd = 'first';
 		$token = $this->passwordReset($email, $pwd);
-		$this->assertTrue($this->um->passwordChange($email, $token, $pwd));
-		$this->assertEquals(3, count($this->um->emails));
-		$this->assertEquals($pwd, end($this->um->emails)['password']);
-		$this->assertTrue($this->um->login($email, $pwd));
+		$this->assertTrue($this->umanager->passwordChange($email, $token, $pwd));
+		$this->assertEquals(3, count($this->umanager->emails));
+		$this->assertEquals($pwd, end($this->umanager->emails)['password']);
+		$this->assertTrue($this->umanager->login($email, $pwd));
 	}
 
 }

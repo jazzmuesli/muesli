@@ -29,9 +29,9 @@ class Template {
 		// Get content from prepared vars
 		$content = $this->evaluate($vars);
 		// Now separate into headers and body, if relevant.
-		$ar = explode('---cut---', $content);
-		$body = count($ar) == 2 ? $ar[1] : $content;
-		$headers = join("\r\n", explode("\n", count($ar) == 2 ? $ar[0] : ""));
+		$parts = explode('---cut---', $content);
+		$body = count($parts) == 2 ? $parts[1] : $content;
+		$headers = join("\r\n", explode("\n", count($parts) == 2 ? $parts[0] : ""));
 		return mail($email, $subject, $body, $headers) ? TRUE : FALSE;
 	}
 

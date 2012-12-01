@@ -6,8 +6,8 @@ class InvalidPasswordException extends Exception {}
 * Class responsible for register-login-password-reset functionality.
 */
 class UserManager {
-	function __construct($db) {
-		$this->db = $db;
+	function __construct($dbh) {
+		$this->dbh = $dbh;
 	}
 
 	/**
@@ -24,14 +24,14 @@ create table user (
 	primary key (email)
 );
 EOF;
-		$this->db->exec($sql);
+		$this->dbh->exec($sql);
 	}
 
 	/**
 	* How many users logged in last minute?
 	*/
 	function userCount($ago) {
-		$sth = $this->db->prepare('select count(email) as c from user where last_login >= :t');
+		$sth = $this->dbh->prepare('select count(email) as c from user where dsds last_login >= :t');
 		$sth->bindValue('t', time() - $ago);
 		$sth->execute();
 		if ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
@@ -67,7 +67,7 @@ EOF;
 	* a constraint violation if the user already exists. It is atomic in contrast to select+insert.
 	*/
 	function register($email, $pwd) {
-                $stmt = $this->db->prepare('insert into user (email,pwd) values(:e, :p)');
+                $stmt = $this->dbh->prepare('insert into user (email,pwd) values(:e, :p)');
 		try {
  	               $result = $this->bindPasswordAndExecute($stmt, $email, $pwd);
 		} catch (PDOException $e) {
@@ -95,7 +95,7 @@ EOF;
 	* Log in the user, set his last_login time and reset the token.
 	*/
 	function login($email, $pwd) {
-		$sth = $this->db->prepare('update user set last_login=:t, reset_token=null where email=:e and pwd=:p');
+		$sth = $this->dbh->prepare('update user set last_login=:t, reset_token=null where email=:e and pwd=:p');
 		$result = $this->bindPasswordAndExecute($sth, $email, $pwd, time());
                 if (!$result) {
                         return false;
@@ -108,7 +108,7 @@ EOF;
 	* Knowing the reset-token, change the password.
 	*/
 	function passwordChange($email, $token, $password) {
-		$sth = $this->db->prepare('update user set pwd=:p, reset_token=null where email=:e and reset_token=:k');
+		$sth = $this->dbh->prepare('update user set pwd=:p, reset_token=null where email=:e and reset_token=:k');
 		$sth->bindValue('k', $token);
 		$success = $this->bindPasswordAndExecute($sth, $email, $password);
 		if ($success && $sth->rowCount() == 1) {
@@ -128,7 +128,7 @@ EOF;
 	*/
 	function passwordReset($email) {
 		$token = md5($email . mt_rand(0, time()));
-		$sth = $this->db->prepare('update user set reset_token=:k where email=:e');
+		$sth = $this->dbh->prepare('update user set reset_token=:k where email=:e');
 		if (!$sth) {
 			throw new Exception('No statement created');
 		}
