@@ -90,17 +90,20 @@ class DateCalculatorTest extends PHPUnit_Framework_TestCase {
 	protected function setUp() {
 		$this->calculator = new OldDateCalculator();
 	}
+	private function formatYMD($month, $day, $year) {
+	        $fnTime = mktime(0, 0, 0, $month, $day, $year);
+                return date("Y-m-d", $fnTime);
+	}
         public function testNovember() {
-                $fnTime = mktime(0, 0, 0, 11, 1, 2012); // first November 2012
-                $date = date("Y-m-d", $fnTime);
+                $date = $this->formatYMD(11, 1, 2012); // first November 2012
                 $this->assertEquals("2012-11-02", $this->calculator->getNextDate($date, DateCalculator::ONE_DAY));
                 $this->assertEquals("2012-11-08", $this->calculator->getNextDate($date, DateCalculator::ONE_WEEK));
 		$this->assertEquals("2012-12-01", $this->calculator->getNextDate($date, DateCalculator::ONE_MONTH));
         }
+
         public function testWithStartDate() {
-                $fnTime = mktime(0, 0, 0, 11, 1, 2012); // first November 2012
-                $date = date("Y-m-d", $fnTime);
-		$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
+                $date = $this->formatYMD(11, 1, 2012); // first November 2012
+         	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
                 $this->assertEquals("2032-12-09", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
 		$this->assertEquals("2012-12-01", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_MONTH, "2012-12-03"));
 
