@@ -94,14 +94,14 @@ class DateCalculatorTest extends PHPUnit_Framework_TestCase {
 	        $fnTime = mktime(0, 0, 0, $month, $day, $year);
                 return date("Y-m-d", $fnTime);
 	}
-        public function testNovember() {
+        public function test1NovemberGetNextDate() {
                 $date = $this->formatYMD(11, 1, 2012); // first November 2012
                 $this->assertEquals("2012-11-02", $this->calculator->getNextDate($date, DateCalculator::ONE_DAY));
                 $this->assertEquals("2012-11-08", $this->calculator->getNextDate($date, DateCalculator::ONE_WEEK));
 		$this->assertEquals("2012-12-01", $this->calculator->getNextDate($date, DateCalculator::ONE_MONTH));
         }
 
-        public function testWithStartDate() {
+        public function test1NovemberGetNextWithStartDate() {
                 $date = $this->formatYMD(11, 1, 2012); // first November 2012
          	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
                 $this->assertEquals("2032-12-09", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
