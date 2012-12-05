@@ -11,11 +11,11 @@ interface DateCalculator {
 	public function getNextDateWithStartDate($date, $repeat_type, $start);
 }
 abstract class AbstractDateCalculator implements DateCalculator {
-	public function formatYMDasYMD($month, $day, $year) {
-		return $this->formatYMD(mktime(0, 0, 0, $month, $day, $year));
+	public function formatAsYMD($month, $day, $year) {
+		return $this->formatUnixTime(mktime(0, 0, 0, $month, $day, $year));
 	}
-	protected function formatYMD($unixtime) {
-		return date("Y-m-d", $unixtime);
+	protected function formatUnixTime($unixtime) {
+		return date("Y-m-", $unixtime);
 	}
 }
 
@@ -98,11 +98,11 @@ class NewDateCalculator extends AbstractDateCalculator {
 					$addDays += 7;
 				}
 				// add the number of days to get to the wanted weekday
-				return $this->formatYMDasYMD($startMonth, $startDay+$addDays, $startYear);
+				return $this->formatAsYMD($startMonth, $startDay+$addDays, $startYear);
 				break;
 			case RepeatType::MONTHLY:
 				// if it's a monthly date just add the month and year of the specific start date
-				return $this->formatYMDasYMD($startMonth, $dateDay, $startYear);
+				return $this->formatAsYMD($startMonth, $dateDay, $startYear);
 			default:
 				throw new Exception("Unknown repeat_type: $repeat_type");
 
@@ -116,11 +116,11 @@ class NewDateCalculator extends AbstractDateCalculator {
 		$dateYear = date("Y", $utime);
 		switch ($repeat_type) {
 			case RepeatType::DAILY:
-				return $this->formatYMDasYMD($dateMonth, $dateDay+1, $dateYear);
+				return $this->formatAsYMD($dateMonth, $dateDay+1, $dateYear);
 			case RepeatType::WEEKLY:
-				return $this->formatYMDasYMD($dateMonth, $dateDay+7, $dateYear);
+				return $this->formatAsYMD($dateMonth, $dateDay+7, $dateYear);
 			case RepeatType::MONTHLY:
-				return $this->formatYMDasYMD($dateMonth+1, $dateDay, $dateYear);
+				return $this->formatAsYMD($dateMonth+1, $dateDay, $dateYear);
 			default:
 				throw new Exception("Unknown repeat_type: $repeat_type");
 		}
@@ -140,28 +140,28 @@ abstract class DateCalculatorTst extends PHPUnit_Framework_TestCase {
 	}
 
         public function test1NovemberGetNextDate() {
-                $date = $this->calculator->formatYMDasYMD(11, 1, 2012); // first November 2012
+                $date = $this->calculator->formatAsYMD(11, 1, 2012); // first November 2012
                 $this->assertEquals("2012-11-02", $this->calculator->getNextDate($date, RepeatType::DAILY));
                 $this->assertEquals("2012-11-08", $this->calculator->getNextDate($date, RepeatType::WEEKLY));
 		$this->assertEquals("2012-12-01", $this->calculator->getNextDate($date, RepeatType::MONTHLY));
         }
 
         public function test1NovemberGetNextWithStartDate() {
-                $date = $this->calculator->formatYMDasYMD(11, 1, 2012); // first November 2012
+                $date = $this->calculator->formatAsYMD(11, 1, 2012); // first November 2012
          	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, RepeatType::DAILY, "2012-12-03"));
                 $this->assertEquals("2032-12-09", $this->calculator->getNextDateWithStartDate($date, RepeatType::WEEKLY, "2032-12-07"));
 		$this->assertEquals("2012-12-01", $this->calculator->getNextDateWithStartDate($date, RepeatType::MONTHLY, "2012-12-03"));
 	}
 
         public function test30NovemberGetNextDate() {
-                $date = $this->calculator->formatYMDasYMD(11, 30, 2012); // 30. November 2012
+                $date = $this->calculator->formatAsYMD(11, 30, 2012); // 30. November 2012
          	$this->assertEquals("2012-12-01", $this->calculator->getNextDate($date, RepeatType::DAILY));
                 $this->assertEquals("2012-12-07", $this->calculator->getNextDate($date, RepeatType::WEEKLY));
 		$this->assertEquals("2012-12-30", $this->calculator->getNextDate($date, RepeatType::MONTHLY));
 	}
 
         public function test30NovemberGetNextWithStartDate() {
-                $date = $this->calculator->formatYMDasYMD(11, 30, 2012); // 30. November 2012
+                $date = $this->calculator->formatAsYMD(11, 30, 2012); // 30. November 2012
          	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, RepeatType::DAILY, "2012-12-03"));
                 $this->assertEquals("2032-12-10", $this->calculator->getNextDateWithStartDate($date, RepeatType::WEEKLY, "2032-12-07"));
 		$this->assertEquals("2012-12-30", $this->calculator->getNextDateWithStartDate($date, RepeatType::MONTHLY, "2012-12-03"));
@@ -171,7 +171,7 @@ abstract class DateCalculatorTst extends PHPUnit_Framework_TestCase {
 	* To cover addDays < 0
 	*/
         public function testMondayNovemberGetNextWithStartDate() {
-                $date = $this->calculator->formatYMDasYMD(11, 26, 2012);
+                $date = $this->calculator->formatAsYMD(11, 26, 2012);
                 $this->assertEquals("2032-12-13", $this->calculator->getNextDateWithStartDate($date, RepeatType::WEEKLY, "2032-12-07"));
 	}
 }
