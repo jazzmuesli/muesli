@@ -101,14 +101,16 @@ class NewDateCalculator implements DateCalculator {
 				$ftime = mktime(0, 0, 0, $dateMonth, $dateDay+7, $dateYear);
 				break;
 			case DateCalculator::ONE_MONTH:
-				$ftime = mktime(0, 0, 0, $dateMonth+1, $dateDay, $dateYear);
-				break;
+				return $this->formatYMDasYMD($dateMonth+1, $dateDay, $dateYear);
 			default:
 				throw new Exception("Unknown repeat_type: $repeat_type");
 		}
 		return $this->formatYMD($ftime);
 	}
 
+	private function formatYMDasYMD($month, $day, $year) {
+		return $this->formatYMD(mktime(0, 0, 0, $month, $day, $year));
+	}
 	private function formatYMD($unixtime) {
 		return date("Y-m-d", $unixtime);
 	}
