@@ -73,11 +73,11 @@ class NewDateCalculator implements DateCalculator {
 				$addDays = $eventWday - $afterWday;
 				$addDays = $addDays + (( $addDays < 0 ) ? ( 7 ) : ( 0 ));
 				// add the number of days to get to the wanted weekday
-				$ftime = mktime(0, 0, 0, $startMonth, date("d",strtotime($start))+$addDays, date("Y",strtotime($start)));
+				$ftime = mktime(0, 0, 0, $startMonth, $startDay+$addDays, $startYear);
 				break;
 			case DateCalculator::ONE_MONTH:
 				// if it's a monthly date just add the month and year of the specific start date
-				$ftime = mktime(0, 0, 0, $startMonth, date("d",strtotime($date)), date("Y",strtotime($start)));
+				$ftime = mktime(0, 0, 0, $startMonth, $dateDay, $startYear);
 				break;
 			default:
 				throw new Exception("Unknown repeat_type: $repeat_type");
