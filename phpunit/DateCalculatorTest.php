@@ -87,9 +87,12 @@ class NewDateCalculator extends AbstractDateCalculator {
 				// get the weekday of the event start date and the weekday of the original event day
 				$eventWday = date("N",strtotime($date));
 				$afterWday = date("N",strtotime($start));
-				// get the difference and add 7 days if it's negative
+				// get the difference
 				$addDays = $eventWday - $afterWday;
-				$addDays = $addDays + (( $addDays < 0 ) ? ( 7 ) : ( 0 ));
+				// and add 7 days if it's negative
+				if ($addDays < 0) {
+					$addDays += 7;
+				}
 				// add the number of days to get to the wanted weekday
 				return $this->formatYMDasYMD($startMonth, $startDay+$addDays, $startYear);
 				break;
@@ -113,7 +116,7 @@ class NewDateCalculator extends AbstractDateCalculator {
 			case DateCalculator::ONE_WEEK:
 				return $this->formatYMDasYMD($dateMonth, $dateDay+7, $dateYear);
 			case DateCalculator::ONE_MONTH:
-				return $this->formatYMDasYMD($dateMonth+1, $dateDay, $dateYear);// Add one month
+				return $this->formatYMDasYMD($dateMonth+1, $dateDay, $dateYear);
 			default:
 				throw new Exception("Unknown repeat_type: $repeat_type");
 		}
