@@ -56,6 +56,9 @@ function getNextDate($date, $repeat_type, $start = false) {
 
 class NewDateCalculator implements DateCalculator {
 	function getNextDateWithStartDate($date, $repeat_type, $start) {
+		$utime = strtotime($date);
+		$dateDay = date("d", $utime);
+
 		$stime = strtotime($start);
 		$startMonth = date("m",$stime);
 		$startDay = date("d", $stime);
