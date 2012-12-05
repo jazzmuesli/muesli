@@ -6,8 +6,16 @@ interface DateCalculator {
 	public function getNextDate($date, $repeat_type);
 	public function getNextDateWithStartDate($date, $repeat_type, $start);
 }
+abstract class AbstractDateCalculator implements DateCalculator {
+	protected function formatYMDasYMD($month, $day, $year) {
+		return $this->formatYMD(mktime(0, 0, 0, $month, $day, $year));
+	}
+	protected function formatYMD($unixtime) {
+		return date("Y-m-d", $unixtime);
+	}
+}
 
-class OldDateCalculator {
+class OldDateCalculator extends AbstractDateCalculator {
 	function __toString() {
 		return "Old getNextDate() implementation";
 	}
@@ -61,7 +69,7 @@ function getNextDate($date, $repeat_type, $start = false) {
 
 }
 
-class NewDateCalculator implements DateCalculator {
+class NewDateCalculator extends AbstractDateCalculator {
 	function getNextDateWithStartDate($date, $repeat_type, $start) {
 		$utime = strtotime($date);
 		$dateDay = date("d", $utime);
@@ -111,12 +119,6 @@ class NewDateCalculator implements DateCalculator {
 		}
 	}
 
-	private function formatYMDasYMD($month, $day, $year) {
-		return $this->formatYMD(mktime(0, 0, 0, $month, $day, $year));
-	}
-	private function formatYMD($unixtime) {
-		return date("Y-m-d", $unixtime);
-	}
 	function __toString() {
 		return "New getNextDate() implementation";
 	}
