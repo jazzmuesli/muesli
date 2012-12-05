@@ -8,6 +8,10 @@ interface DateCalculator {
 }
 
 class OldDateCalculator {
+	function __toString() {
+		return "Old getNextDate() implementation";
+	}
+
 function getNextDateWithStartDate($date, $repeat_type, $start) {
 	return $this->getNextDate($date, $repeat_type, $start);
 }
@@ -25,6 +29,9 @@ function getNextDate($date, $repeat_type, $start = false) {
 			$return_date = date("Y-m-d", mktime(0, 0, 0, date("m",strtotime($date))+1  , date("d",strtotime($date)), date("Y",strtotime($date))));
 			break;
 	}//PR: $return_date will not be used again.
+	if ($return_date && !$start) {
+		return $return_date;
+	}
 	// if the date has to start on or after a specific date:
 	if ( $start ) {
 		switch ($repeat_type) {
@@ -80,8 +87,7 @@ class NewDateCalculator implements DateCalculator {
 				break;
 			case DateCalculator::ONE_MONTH:
 				// if it's a monthly date just add the month and year of the specific start date
-				$ftime = mktime(0, 0, 0, $startMonth, $dateDay, $startYear);
-				break;
+				return $this->formatYMDasYMD($startMonth, $dateDay, $startYear);
 			default:
 				throw new Exception("Unknown repeat_type: $repeat_type");
 
@@ -111,13 +117,17 @@ class NewDateCalculator implements DateCalculator {
 	private function formatYMD($unixtime) {
 		return date("Y-m-d", $unixtime);
 	}
+	function __toString() {
+		return "New getNextDate() implementation";
+	}
 }
 
-class DateCalculatorTest extends PHPUnit_Framework_TestCase {
+abstract class DateCalculatorTst extends PHPUnit_Framework_TestCase {
 
 	protected $calculator;
-	protected function setUp() {
-		$this->calculator = new OldDateCalculator();
+	function __construct($calc) {
+		$this->calculator = $calc;
+print "Using calculator: " . $calc . "\n";
 	}
 	private function formatYMD($month, $day, $year) {
 	        $fnTime = mktime(0, 0, 0, $month, $day, $year);
@@ -137,6 +147,13 @@ class DateCalculatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals("2012-12-01", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_MONTH, "2012-12-03"));
 	}
 
+        public function test30NovemberGetNextDate() {
+                $date = $this->formatYMD(11, 30, 2012); // 30. November 2012
+         	$this->assertEquals("2012-12-01", $this->calculator->getNextDate($date, DateCalculator::ONE_DAY));
+                $this->assertEquals("2012-12-07", $this->calculator->getNextDate($date, DateCalculator::ONE_WEEK));
+		$this->assertEquals("2012-12-30", $this->calculator->getNextDate($date, DateCalculator::ONE_MONTH));
+	}
+
         public function test30NovemberGetNextWithStartDate() {
                 $date = $this->formatYMD(11, 30, 2012); // 30. November 2012
          	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
@@ -144,13 +161,6 @@ class DateCalculatorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals("2012-12-30", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_MONTH, "2012-12-03"));
 	}
 
-        public function test30NovemberGetNextDate() {
-                $date = $this->formatYMD(11, 30, 2012); // 30. November 2012
-         	$this->assertEquals("2012-12-03", $this->calculator->getNextDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
-                $this->assertEquals("2032-12-10", $this->calculator->getNextDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
-		$this->assertEquals("2012-12-30", $this->calculator->getNextDate($date, DateCalculator::ONE_MONTH, "2012-12-03"));
-	}
 
 }
-
 ?>
