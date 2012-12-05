@@ -56,7 +56,30 @@ function getNextDate($date, $repeat_type, $start = false) {
 
 class NewDateCalculator implements DateCalculator {
 	function getNextDateWithStartDate($date, $repeat_type, $start) {
-		return "TODO";
+		switch ($repeat_type) {
+			case DateCalculator::ONE_DAY:
+				// if it's a daily event it can start on the specified date
+				return $start;
+			case DateCalculator::ONE_WEEK:
+				// for weekly events:
+				// get the weekday of the event start date and the weekday of the original event day
+				$eventWday = date("N",strtotime($date));
+				$afterWday = date("N",strtotime($start));
+				// get the difference and add 7 days if it's negative
+				$addDays = $eventWday - $afterWday;
+				$addDays = $addDays + (( $addDays < 0 ) ? ( 7 ) : ( 0 ));
+				// add the number of days to get to the wanted weekday
+				$ftime = mktime(0, 0, 0, date("m",strtotime($start))  , date("d",strtotime($start))+$addDays, date("Y",strtotime($start)));
+				break;
+			case DateCalculator::ONE_MONTH:
+				// if it's a monthly date just add the month and year of the specific start date
+				$ftime = mktime(0, 0, 0, date("m",strtotime($start))  , date("d",strtotime($date)), date("Y",strtotime($start)));
+				break;
+			default:
+				throw new Exception("Unknown repeat_type: $repeat_type");
+
+		}
+		return $this->formatYMD($ftime);
 	}
 	function getNextDate($date, $repeat_type) {
 		$utime = strtotime($date);
