@@ -136,7 +136,6 @@ abstract class DateCalculatorTst extends PHPUnit_Framework_TestCase {
 	protected $calculator;
 	function __construct($calc) {
 		$this->calculator = $calc;
-		print "Using calculator: " . $calc . "\n";
 	}
 
         public function test1NovemberGetNextDate() {
