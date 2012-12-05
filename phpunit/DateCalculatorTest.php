@@ -129,7 +129,7 @@ abstract class DateCalculatorTst extends PHPUnit_Framework_TestCase {
 	protected $calculator;
 	function __construct($calc) {
 		$this->calculator = $calc;
-print "Using calculator: " . $calc . "\n";
+		print "Using calculator: " . $calc . "\n";
 	}
 
         public function test1NovemberGetNextDate() {
@@ -158,6 +158,14 @@ print "Using calculator: " . $calc . "\n";
          	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
                 $this->assertEquals("2032-12-10", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
 		$this->assertEquals("2012-12-30", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_MONTH, "2012-12-03"));
+	}
+
+	/**
+	* To cover addDays < 0
+	*/
+        public function testMondayNovemberGetNextWithStartDate() {
+                $date = $this->calculator->formatYMDasYMD(11, 26, 2012);
+                $this->assertEquals("2032-12-13", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
 	}
 
 }
