@@ -14,8 +14,8 @@ abstract class AbstractDateCalculator implements DateCalculator {
 	public function formatAsYMD($month, $day, $year) {
 		return $this->formatUnixTime(mktime(0, 0, 0, $month, $day, $year));
 	}
-	protected function formatUnixTime($unixtime) {
-		return date("Y-m-", $unixtime);
+	private function formatUnixTime($unixtime) {
+		return date("Y-m-d", $unixtime);
 	}
 }
 
@@ -24,11 +24,11 @@ class OldDateCalculator extends AbstractDateCalculator {
 		return "Old getNextDate() implementation";
 	}
 
-function getNextDateWithStartDate($date, $repeat_type, $start) {
-	return $this->getNextDate($date, $repeat_type, $start);
-}
-// helper functions
-function getNextDate($date, $repeat_type, $start = false) {
+	function getNextDateWithStartDate($date, $repeat_type, $start) {
+		return $this->getNextDate($date, $repeat_type, $start);
+	}
+	// helper functions
+	function getNextDate($date, $repeat_type, $start = false) {
 	// calculate new event date
 	switch ($repeat_type) {
 		case 1:
