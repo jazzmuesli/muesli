@@ -1,8 +1,8 @@
 <?php
 interface DateCalculator {
-	const ONE_DAY = 1;
-	const ONE_WEEK = 2;
-	const ONE_MONTH = 3;
+	const DAILY = 1;
+	const WEEKLY = 2;
+	const MONTHLY = 3;
 	public function getNextDate($date, $repeat_type);
 	public function getNextDateWithStartDate($date, $repeat_type, $start);
 }
@@ -79,10 +79,10 @@ class NewDateCalculator extends AbstractDateCalculator {
 		$startDay = date("d", $stime);
 		$startYear = date("Y", $stime);
 		switch ($repeat_type) {
-			case parent::ONE_DAY:
+			case parent::DAILY:
 				// if it's a daily event it can start on the specified date
 				return $start;
-			case parent::ONE_WEEK:
+			case parent::WEEKLY:
 				// for weekly events:
 				// get the weekday of the event start date and the weekday of the original event day
 				$eventWday = date("N",strtotime($date));
@@ -96,7 +96,7 @@ class NewDateCalculator extends AbstractDateCalculator {
 				// add the number of days to get to the wanted weekday
 				return $this->formatYMDasYMD($startMonth, $startDay+$addDays, $startYear);
 				break;
-			case parent::ONE_MONTH:
+			case parent::MONTHLY:
 				// if it's a monthly date just add the month and year of the specific start date
 				return $this->formatYMDasYMD($startMonth, $dateDay, $startYear);
 			default:
@@ -111,11 +111,11 @@ class NewDateCalculator extends AbstractDateCalculator {
 		$dateDay = date("d", $utime);
 		$dateYear = date("Y", $utime);
 		switch ($repeat_type) {
-			case DateCalculator::ONE_DAY:
+			case DateCalculator::DAILY:
 				return $this->formatYMDasYMD($dateMonth, $dateDay+1, $dateYear);
-			case DateCalculator::ONE_WEEK:
+			case DateCalculator::WEEKLY:
 				return $this->formatYMDasYMD($dateMonth, $dateDay+7, $dateYear);
-			case DateCalculator::ONE_MONTH:
+			case DateCalculator::MONTHLY:
 				return $this->formatYMDasYMD($dateMonth+1, $dateDay, $dateYear);
 			default:
 				throw new Exception("Unknown repeat_type: $repeat_type");
@@ -137,30 +137,30 @@ abstract class DateCalculatorTst extends PHPUnit_Framework_TestCase {
 
         public function test1NovemberGetNextDate() {
                 $date = $this->calculator->formatYMDasYMD(11, 1, 2012); // first November 2012
-                $this->assertEquals("2012-11-02", $this->calculator->getNextDate($date, DateCalculator::ONE_DAY));
-                $this->assertEquals("2012-11-08", $this->calculator->getNextDate($date, DateCalculator::ONE_WEEK));
-		$this->assertEquals("2012-12-01", $this->calculator->getNextDate($date, DateCalculator::ONE_MONTH));
+                $this->assertEquals("2012-11-02", $this->calculator->getNextDate($date, DateCalculator::DAILY));
+                $this->assertEquals("2012-11-08", $this->calculator->getNextDate($date, DateCalculator::WEEKLY));
+		$this->assertEquals("2012-12-01", $this->calculator->getNextDate($date, DateCalculator::MONTHLY));
         }
 
         public function test1NovemberGetNextWithStartDate() {
                 $date = $this->calculator->formatYMDasYMD(11, 1, 2012); // first November 2012
-         	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
-                $this->assertEquals("2032-12-09", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
-		$this->assertEquals("2012-12-01", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_MONTH, "2012-12-03"));
+         	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::DAILY, "2012-12-03"));
+                $this->assertEquals("2032-12-09", $this->calculator->getNextDateWithStartDate($date, DateCalculator::WEEKLY, "2032-12-07"));
+		$this->assertEquals("2012-12-01", $this->calculator->getNextDateWithStartDate($date, DateCalculator::MONTHLY, "2012-12-03"));
 	}
 
         public function test30NovemberGetNextDate() {
                 $date = $this->calculator->formatYMDasYMD(11, 30, 2012); // 30. November 2012
-         	$this->assertEquals("2012-12-01", $this->calculator->getNextDate($date, DateCalculator::ONE_DAY));
-                $this->assertEquals("2012-12-07", $this->calculator->getNextDate($date, DateCalculator::ONE_WEEK));
-		$this->assertEquals("2012-12-30", $this->calculator->getNextDate($date, DateCalculator::ONE_MONTH));
+         	$this->assertEquals("2012-12-01", $this->calculator->getNextDate($date, DateCalculator::DAILY));
+                $this->assertEquals("2012-12-07", $this->calculator->getNextDate($date, DateCalculator::WEEKLY));
+		$this->assertEquals("2012-12-30", $this->calculator->getNextDate($date, DateCalculator::MONTHLY));
 	}
 
         public function test30NovemberGetNextWithStartDate() {
                 $date = $this->calculator->formatYMDasYMD(11, 30, 2012); // 30. November 2012
-         	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
-                $this->assertEquals("2032-12-10", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
-		$this->assertEquals("2012-12-30", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_MONTH, "2012-12-03"));
+         	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::DAILY, "2012-12-03"));
+                $this->assertEquals("2032-12-10", $this->calculator->getNextDateWithStartDate($date, DateCalculator::WEEKLY, "2032-12-07"));
+		$this->assertEquals("2012-12-30", $this->calculator->getNextDateWithStartDate($date, DateCalculator::MONTHLY, "2012-12-03"));
 	}
 
 	/**
@@ -168,7 +168,7 @@ abstract class DateCalculatorTst extends PHPUnit_Framework_TestCase {
 	*/
         public function testMondayNovemberGetNextWithStartDate() {
                 $date = $this->calculator->formatYMDasYMD(11, 26, 2012);
-                $this->assertEquals("2032-12-13", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
+                $this->assertEquals("2032-12-13", $this->calculator->getNextDateWithStartDate($date, DateCalculator::WEEKLY, "2032-12-07"));
 	}
 
 }
