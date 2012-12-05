@@ -95,17 +95,14 @@ class NewDateCalculator implements DateCalculator {
 		$dateYear = date("Y", $utime);
 		switch ($repeat_type) {
 			case DateCalculator::ONE_DAY:
-				$ftime = mktime(0, 0, 0, $dateMonth, $dateDay+1, $dateYear);
-				break;
+				return $this->formatYMDasYMD($dateMonth, $dateDay+1, $dateYear);
 			case DateCalculator::ONE_WEEK:
-				$ftime = mktime(0, 0, 0, $dateMonth, $dateDay+7, $dateYear);
-				break;
+				return $this->formatYMDasYMD($dateMonth, $dateDay+7, $dateYear);
 			case DateCalculator::ONE_MONTH:
-				return $this->formatYMDasYMD($dateMonth+1, $dateDay, $dateYear);
+				return $this->formatYMDasYMD($dateMonth+1, $dateDay, $dateYear);// Add one month
 			default:
 				throw new Exception("Unknown repeat_type: $repeat_type");
 		}
-		return $this->formatYMD($ftime);
 	}
 
 	private function formatYMDasYMD($month, $day, $year) {
@@ -120,7 +117,7 @@ class DateCalculatorTest extends PHPUnit_Framework_TestCase {
 
 	protected $calculator;
 	protected function setUp() {
-		$this->calculator = new NewDateCalculator();
+		$this->calculator = new OldDateCalculator();
 	}
 	private function formatYMD($month, $day, $year) {
 	        $fnTime = mktime(0, 0, 0, $month, $day, $year);
@@ -145,6 +142,13 @@ class DateCalculatorTest extends PHPUnit_Framework_TestCase {
          	$this->assertEquals("2012-12-03", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
                 $this->assertEquals("2032-12-10", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
 		$this->assertEquals("2012-12-30", $this->calculator->getNextDateWithStartDate($date, DateCalculator::ONE_MONTH, "2012-12-03"));
+	}
+
+        public function test30NovemberGetNextDate() {
+                $date = $this->formatYMD(11, 30, 2012); // 30. November 2012
+         	$this->assertEquals("2012-12-03", $this->calculator->getNextDate($date, DateCalculator::ONE_DAY, "2012-12-03"));
+                $this->assertEquals("2032-12-10", $this->calculator->getNextDate($date, DateCalculator::ONE_WEEK, "2032-12-07"));
+		$this->assertEquals("2012-12-30", $this->calculator->getNextDate($date, DateCalculator::ONE_MONTH, "2012-12-03"));
 	}
 
 }
